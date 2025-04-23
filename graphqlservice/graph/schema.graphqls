@@ -1,0 +1,28 @@
+type Post {
+  id: ID!
+  userId: ID!
+  content: String!
+  createdAt: String!
+  imageUrls: [String!]
+  hasServerArchitectureDiagram: Boolean!
+}
+
+type Query {
+  getTimeline(userId: ID!): [Post!]!
+}
+
+type Mutation {
+  createPost(userId: ID!, content: String!): Post!
+  updatePost(id: ID!, content: String!): Post!
+  deletePost(id: ID!): DeleteResponse!
+}
+
+type DeleteResponse {
+  success: Boolean!
+  message: String
+}
+
+schema {
+  query: Query
+  mutation: Mutation
+} 

@@ -1,0 +1,122 @@
+{
+	"info": {
+		"_postman_id": "9a9f9a9f-9a9f-9a9f-9a9f-9a9f9a9f9a9f",
+		"name": "Paper.Social GraphQL API",
+		"description": "A collection of GraphQL API requests for Paper.Social",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Timeline",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"query\": \"{ getTimeline(userId: \\\"user1\\\") { id userId content createdAt imageUrls hasServerArchitectureDiagram } }\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"query"
+					]
+				},
+				"description": "Get a user's timeline (posts from users they follow)"
+			}
+		},
+		{
+			"name": "Create Post",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"query\": \"mutation { createPost(userId: \\\"user1\\\", content: \\\"This is a new post!\\\") { id userId content createdAt } }\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"query"
+					]
+				},
+				"description": "Create a new post"
+			}
+		},
+		{
+			"name": "Update Post",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"query\": \"mutation { updatePost(id: \\\"post1\\\", content: \\\"Updated content for this post\\\") { id userId content createdAt } }\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"query"
+					]
+				},
+				"description": "Update an existing post"
+			}
+		},
+		{
+			"name": "Delete Post",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n  \"query\": \"mutation { deletePost(id: \\\"post1\\\") { success message } }\"\n}"
+				},
+				"url": {
+					"raw": "http://localhost:8080/query",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"query"
+					]
+				},
+				"description": "Delete a post"
+			}
+		}
+	]
+} 

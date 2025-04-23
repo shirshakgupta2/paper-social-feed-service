@@ -1,0 +1,61 @@
+syntax = "proto3";
+
+package post;
+
+option go_package = "github.com/paper-social/feed-service/proto/post";
+
+// Post service for managing posts
+service PostService {
+  // Lists posts for a specific user
+  rpc ListPostsByUser(ListPostsRequest) returns (ListPostsResponse);
+  
+  // Creates a new post
+  rpc CreatePost(CreatePostRequest) returns (Post);
+  
+  // Updates an existing post
+  rpc UpdatePost(UpdatePostRequest) returns (Post);
+  
+  // Deletes a post
+  rpc DeletePost(DeletePostRequest) returns (DeletePostResponse);
+}
+
+// Request message for ListPostsByUser
+message ListPostsRequest {
+  string user_id = 1;
+}
+
+// Response message for ListPostsByUser
+message ListPostsResponse {
+  repeated Post posts = 1;
+}
+
+// Request message for CreatePost
+message CreatePostRequest {
+  string user_id = 1;
+  string content = 2;
+}
+
+// Request message for UpdatePost
+message UpdatePostRequest {
+  string id = 1;
+  string content = 2;
+}
+
+// Request message for DeletePost
+message DeletePostRequest {
+  string id = 1;
+}
+
+// Response message for DeletePost
+message DeletePostResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+// Post represents a single post in the system
+message Post {
+  string id = 1;
+  string user_id = 2;
+  string content = 3;
+  int64 created_at = 4; // Unix timestamp
+} 
