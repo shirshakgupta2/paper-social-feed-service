@@ -18,7 +18,7 @@
 				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n  \"query\": \"{ getTimeline(userId: \\\"user1\\\") { id userId content createdAt imageUrls hasServerArchitectureDiagram } }\"\n}"
+					"raw": "{\n  \"query\": \"{ getTimeline(userId: \\\"user1\\\") { id userId content createdAt imageUrls } }\"\n}"
 				},
 				"url": {
 					"raw": "http://localhost:8080/query",

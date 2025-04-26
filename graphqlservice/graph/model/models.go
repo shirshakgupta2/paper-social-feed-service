@@ -5,12 +5,11 @@ package model
 
 // Post represents a post in the GraphQL model
 type Post struct {
-	ID                           string   `json:"id"`
-	UserID                       string   `json:"userId"`
-	Content                      string   `json:"content"`
-	CreatedAt                    string   `json:"createdAt"`
-	ImageUrls                    []string `json:"imageUrls,omitempty"`
-	HasServerArchitectureDiagram bool     `json:"hasServerArchitectureDiagram"`
+	ID        string   `json:"id"`
+	UserID    string   `json:"userId"`
+	Content   string   `json:"content"`
+	CreatedAt string   `json:"createdAt"`
+	ImageUrls []string `json:"imageUrls,omitempty"`
 }
 
 // DeleteResponse represents the response to a delete post operation

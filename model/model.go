@@ -3,7 +3,6 @@ package model
 import (
 	"fmt"
 	"regexp"
-	"strings"
 	"time"
 )
 
@@ -32,28 +31,6 @@ func (p *Post) GetImageURLsFromContent() []string {
 // ContainsImages checks if the post content contains images
 func (p *Post) ContainsImages() bool {
 	return len(p.GetImageURLsFromContent()) > 0
-}
-
-// HasServerArchitectureDiagram checks if the post might contain server architecture diagrams
-// This is a simple check based on content keywords
-func (p *Post) HasServerArchitectureDiagram() bool {
-	lowerContent := strings.ToLower(p.Content)
-	keywords := []string{
-		"architecture",
-		"diagram",
-		"server",
-		"microservice",
-		"infrastructure",
-		"system design",
-	}
-
-	for _, keyword := range keywords {
-		if strings.Contains(lowerContent, keyword) {
-			return true
-		}
-	}
-
-	return false
 }
 
 // Database is an in-memory database simulation

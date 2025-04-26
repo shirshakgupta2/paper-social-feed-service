@@ -49,14 +49,15 @@ models:
   ID:
     model:
       - github.com/99designs/gqlgen/graphql.ID
-      - github.com/99designs/gqlgen/graphql.Int
-      - github.com/99designs/gqlgen/graphql.Int64
-      - github.com/99designs/gqlgen/graphql.Int32
   Int:
     model:
       - github.com/99designs/gqlgen/graphql.Int
-      - github.com/99designs/gqlgen/graphql.Int64
-      - github.com/99designs/gqlgen/graphql.Int32
+  String:
+    model:
+      - github.com/99designs/gqlgen/graphql.String
+  Boolean:
+    model:
+      - github.com/99designs/gqlgen/graphql.Boolean
   Post:
     model: github.com/paper-social/feed-service/graphqlservice/graph/model.Post
     fields:
@@ -69,6 +70,4 @@ models:
       createdAt:
         resolver: false
       imageUrls:
-        resolver: true
-      hasServerArchitectureDiagram:
         resolver: true 
