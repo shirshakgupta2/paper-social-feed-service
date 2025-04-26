@@ -1,175 +1,163 @@
-# Paper.Social Feed Service
+# Paper.Social Feed Microservice System
 
-This service handles the social feed functionality for Paper.Social, implementing both GraphQL and gRPC APIs for post management.
+This project implements a simplified backend for a social feed system like Paper.Social. The architecture consists of two microservices:
+
+1. **Post Service** (gRPC) - Internal service for post CRUD operations
+2. **GraphQL Service** - Public API for accessing the social feed
 
 ## Project Structure
 
 ```
 .
-├── graphqlservice/           # GraphQL API service
-│   └── graph/
-│       ├── model/           # GraphQL models
-│       ├── schema.graphqls  # GraphQL schema
-│       └── resolver.go      # GraphQL resolvers
-├── proto/                   # gRPC service
-│   └── post/
-│       ├── post.proto      # Protocol Buffers definition
-│       ├── post.pb.go      # Generated message types
-│       └── post_grpc.pb.go # Generated gRPC service
-└── README.md               # This file
+├── cmd/                  # Orchestrator to run both services
+├── docs/                 # Documentation
+│   ├── architecture.md   # System architecture overview
+│   ├── code_generation.md # Code generation guide
+│   ├── development.md    # Development workflow
+│   ├── graphql_documentation.md # GraphQL API documentation
+│   └── startup_guide.md  # Detailed startup instructions
+├── graphqlservice/       # GraphQL service implementation
+│   ├── cmd/              # GraphQL service entry point
+│   ├── graph/            # GraphQL schema and resolvers
+│   └── service.go        # Core service implementation
+├── model/                # Shared data models
+├── postservice/          # gRPC post service 
+│   ├── cmd/              # Post service entry point
+│   └── server.go         # gRPC server implementation
+└── proto/                # Protocol Buffers definitions
+    └── post/             # Post service protobuf
 ```
 
-## Prerequisites
+## Features
 
-- Go 1.22 or later
-- Protocol Buffers compiler (protoc) v6.30.2 or later
-- GraphQL code generator (gqlgen)
-- gRPC tools
+- **Timeline API**: Fetch the latest 20 posts from followed users, sorted by time
+- **Post Management**: Create, read, update, and delete posts
+- **Image URL Detection**: Automatically detect image URLs in post content
+- **Parallel Processing**: Fetch posts from multiple users concurrently using goroutines
+- **In-Memory Database**: Simulated database with mock data for testing
+- **Orchestrated Startup**: Single command to start all services in the correct order
+- **Port Availability Checking**: Prevents port conflicts when starting services
 
-## Installation
+## Quick Start
 
-1. **Install Go**
-   - Download from [golang.org](https://golang.org/dl/)
-   - Verify installation:
-     ```bash
-     go version
-     ```
+### Option 1: Run both services with the orchestrator (Recommended)
 
-2. **Install Protocol Buffers Compiler**
-   - Download from [protobuf releases](https://github.com/protocolbuffers/protobuf/releases)
-   - Add to PATH
-   - Verify installation:
-     ```bash
-     protoc --version
-     ```
+```bash
+go run cmd/main.go
+```
 
-3. **Install Go tools**
-   ```bash
-   # Install protoc-gen-go (Protocol Buffers for Go)
-   go install google.golang.org/protobuf/cmd/protoc-gen-go@latest
+This will start both the Post Service and the GraphQL Service in the correct order. The orchestrator:
+- Checks if ports are available
+- Starts the Post Service on port 50051 (internal)
+- Waits for it to initialize
+- Starts the GraphQL Service on port 8080 (public)
+- Provides a nice URL display for accessing the playground
 
-   # Install protoc-gen-go-grpc (gRPC for Go)
-   go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@latest
+### Option 2: Run services individually
 
-   # Install gqlgen (GraphQL for Go)
-   go install github.com/99designs/gqlgen@latest
-   ```
+In one terminal, start the Post Service:
 
-4. **Clone the repository**
-   ```bash
-   git clone https://github.com/paper-social/feed-service.git
-   cd feed-service
-   ```
+```bash
+go run postservice/cmd/main.go
+```
 
-5. **Install dependencies**
-   ```bash
-   go mod download
-   ```
+In another terminal, start the GraphQL Service:
 
-## Code Generation
+```bash
+go run graphqlservice/cmd/main.go
+```
 
-### GraphQL Code Generation
+For detailed startup instructions, troubleshooting, and more, see [Startup Guide](docs/startup_guide.md).
 
-The GraphQL code is generated using `gqlgen` based on the schema defined in `graphqlservice/graph/schema.graphqls`.
+## Accessing the API
 
-1. **Configuration**
-   - The generation is configured in `gqlgen.yml`
-   - Key configuration includes:
-     - Schema location
-     - Output locations for generated code
-     - Type mappings
+- **GraphQL Playground**: http://localhost:8080
+- **GraphQL Endpoint**: http://localhost:8080/query
 
-2. **Generate code**
-   ```bash
-   go run github.com/99designs/gqlgen generate
-   ```
+## Example Queries
 
-3. **Generated files**
-   - `graphqlservice/graph/model/models_gen.go`: Generated models
-   - `graphqlservice/graph/generated/generated.go`: Generated GraphQL server code
+### Get Timeline
 
-### gRPC Code Generation
+```graphql
+query {
+  getTimeline(userId: "user1") {
+    id
+    userId
+    content
+    createdAt
+    imageUrls
+  }
+}
+```
 
-The gRPC code is generated using `protoc` based on the protocol buffer definition in `proto/post/post.proto`.
+### Create Post
 
-1. **Generate code**
-   ```bash
-   cd proto/post
-   protoc --go_out=. --go-grpc_out=. post.proto
-   ```
+```graphql
+mutation {
+  createPost(userId: "user1", content: "This is a new post with an image: https://example.com/image.jpg") {
+    id
+    content
+    createdAt
+    imageUrls
+  }
+}
+```
 
-2. **Generated files**
-   - `post.pb.go`: Message types and serialization code
-   - `post_grpc.pb.go`: gRPC service definitions
+### Update Post
+
+```graphql
+mutation {
+  updatePost(id: "post1", content: "Updated content") {
+    id
+    content
+    imageUrls
+  }
+}
+```
+
+### Delete Post
+
+```graphql
+mutation {
+  deletePost(id: "post1") {
+    success
+    message
+  }
+}
+```
+
+For complete API documentation, see [GraphQL Documentation](docs/graphql_documentation.md).
+
+## Architecture
+
+This project uses a microservices architecture with:
+
+- **Orchestrator**: Manages service lifecycle
+- **Post Service (gRPC)**: Handles post CRUD operations internally
+- **GraphQL Service**: Provides public API and communicates with Post Service
+- **Shared Model**: Common data structures and in-memory database
+
+For a detailed architecture overview including flow diagrams, see [Architecture Documentation](docs/architecture.md).
 
 ## Development
 
-### GraphQL Development
+For information on development workflow, code generation, and best practices, see:
+- [Development Workflow](docs/development.md)
+- [Code Generation Guide](docs/code_generation.md)
 
-1. **Schema Updates**
-   - Modify `graphqlservice/graph/schema.graphqls`
-   - Run code generation
-   - Implement new resolvers in `resolver.go`
+## Technical Implementation Details
 
-2. **Run GraphQL server**
-   ```bash
-   go run ./cmd/server
-   ```
+- **Concurrency**: The timeline aggregation uses goroutines and mutex to fetch posts from followed users in parallel
+- **Data Model**: In-memory simulation of a database with users, follower relationships, and posts
+- **Error Handling**: Proper error propagation from the gRPC service to the GraphQL API
+- **Image Detection**: Regular expressions to extract image URLs from post content
+- **Port Management**: Dynamic port availability checking to prevent conflicts
 
-3. **Access GraphQL Playground**
-   - Open `http://localhost:8080/graphql` in your browser
+## Further Improvements
 
-### gRPC Development
-
-1. **Proto Updates**
-   - Modify `proto/post/post.proto`
-   - Run code generation
-   - Implement new service methods
-
-2. **Run gRPC server**
-   ```bash
-   go run ./cmd/grpc
-   ```
-
-## API Documentation
-
-### GraphQL API
-
-The GraphQL API provides the following operations:
-
-```graphql
-type Query {
-  getTimeline(userId: ID!): [Post!]!
-}
-
-type Mutation {
-  createPost(userId: ID!, content: String!): Post!
-  updatePost(id: ID!, content: String!): Post!
-  deletePost(id: ID!): DeleteResponse!
-}
-```
-
-### gRPC API
-
-The gRPC service provides the following methods:
-
-```protobuf
-service PostService {
-  rpc ListPostsByUser(ListPostsRequest) returns (ListPostsResponse);
-  rpc CreatePost(CreatePostRequest) returns (Post);
-  rpc UpdatePost(UpdatePostRequest) returns (Post);
-  rpc DeletePost(DeletePostRequest) returns (DeletePostResponse);
-}
-```
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the LICENSE file for details. 
+- Add authentication and authorization
+- Implement pagination for timeline results
+- Add caching for frequently accessed timelines
+- Create subscription for real-time updates to timeline
+- Add test suite for both services
+- Containerize services for production deployment 

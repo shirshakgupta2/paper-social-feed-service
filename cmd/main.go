@@ -1,16 +1,47 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"net"
 	"os"
 	"os/exec"
 	"os/signal"
 	"path/filepath"
 	"syscall"
+	"time"
 )
+
+// checkPortAvailable returns true if the port is available for binding
+func checkPortAvailable(port string) bool {
+	ln, err := net.Listen("tcp", port)
+	if err != nil {
+		return false
+	}
+	ln.Close()
+	return true
+}
 
 func main() {
 	log.Println("Starting Paper.Social Feed Microservice System")
+
+	// Check if ports are available
+	postServicePort := ":50051"
+	graphqlPort := ":8080"
+
+	if !checkPortAvailable(postServicePort) {
+		log.Printf("Port %s is already in use. Please stop any existing instances before running this command.", postServicePort)
+		log.Printf("On Windows, you can use: taskkill /F /FI \"PID ne 0\" /IM \"go.exe\" /T")
+		log.Printf("On Linux/Mac, you can use: pkill -f \"go run\"")
+		os.Exit(1)
+	}
+
+	if !checkPortAvailable(graphqlPort) {
+		log.Printf("Port %s is already in use. Please stop any existing instances before running this command.", graphqlPort)
+		log.Printf("On Windows, you can use: taskkill /F /FI \"PID ne 0\" /IM \"go.exe\" /T")
+		log.Printf("On Linux/Mac, you can use: pkill -f \"go run\"")
+		os.Exit(1)
+	}
 
 	// Get the current working directory
 	workDir, err := os.Getwd()
@@ -37,6 +68,10 @@ func main() {
 		log.Fatalf("Failed to start post service: %v", err)
 	}
 
+	// Give the post service a moment to start up
+	log.Println("Post service starting... waiting 2 seconds before starting GraphQL service")
+	time.Sleep(2 * time.Second)
+
 	// Start the GraphQL service (external API)
 	graphqlServiceCmd := exec.Command("go", "run", filepath.Join(workDir, "graphqlservice", "cmd", "main.go"))
 	graphqlServiceCmd.Stdout = os.Stdout
@@ -49,6 +84,13 @@ func main() {
 	log.Println("Post Service (internal) available at localhost:50051")
 	log.Println("GraphQL API (public) available at http://localhost:8080/query")
 	log.Println("GraphQL Playground available at http://localhost:8080")
+
+	// Display URL with additional info
+	fmt.Println("\n----------------------------------------------------------")
+	fmt.Println("🚀 Access GraphQL Playground: http://localhost:8080")
+	fmt.Println("📋 Try the example queries in the README.md file")
+	fmt.Println("⚠️ Press Ctrl+C to stop all services")
+	fmt.Println("----------------------------------------------------------\n")
 
 	// Set up signal catching
 	signals := make(chan os.Signal, 1)

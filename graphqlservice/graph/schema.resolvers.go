@@ -23,7 +23,7 @@ func (r *mutationResolver) CreatePost(ctx context.Context, userID string, conten
 		UserID:    post.UserID,
 		Content:   post.Content,
 		CreatedAt: post.CreatedAt,
-		ImageUrls: getImageURLs(post.Content),
+		ImageUrls: post.ImageURLs,
 	}, nil
 }
 
@@ -39,7 +39,7 @@ func (r *mutationResolver) UpdatePost(ctx context.Context, id string, content st
 		UserID:    post.UserID,
 		Content:   post.Content,
 		CreatedAt: post.CreatedAt,
-		ImageUrls: getImageURLs(post.Content),
+		ImageUrls: post.ImageURLs,
 	}, nil
 }
 
@@ -59,7 +59,7 @@ func (r *mutationResolver) DeletePost(ctx context.Context, id string) (*model.De
 
 // ImageUrls is the resolver for the imageUrls field.
 func (r *postResolver) ImageUrls(ctx context.Context, obj *model.Post) ([]string, error) {
-	return getImageURLs(obj.Content), nil
+	return obj.ImageUrls, nil
 }
 
 // GetTimeline is the resolver for the getTimeline field.
@@ -76,7 +76,7 @@ func (r *queryResolver) GetTimeline(ctx context.Context, userID string) ([]*mode
 			UserID:    p.UserID,
 			Content:   p.Content,
 			CreatedAt: p.CreatedAt,
-			ImageUrls: getImageURLs(p.Content),
+			ImageUrls: p.ImageURLs,
 		}
 	}
 
